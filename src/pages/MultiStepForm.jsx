@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import 'animate.css';
-import logo from '../assets/faucek_Logo.png';
+import logo from '../assets/Faucek_Logo.png';
 import banner from '../assets/faucek_banner.jpg';
 import BadgeModal from './BadgeModal';
 // import tiles from '../assets/tiles.jpeg';
