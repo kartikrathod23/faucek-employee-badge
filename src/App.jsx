@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import MultiStepForm from './pages/MultiStepForm'
+import ThankYouPage from './pages/ThankyouPage'
 // import SubmissionsList from './pages/SubmissionsList';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
@@ -11,6 +12,7 @@ function App() {
     <Router>
         <Routes>
           <Route path="/" element={<MultiStepForm />} />
+          <Route path="/thank-you" element={<ThankYouPage />} />
           {/* <Route path="/submissions" element={<SubmissionsList />} /> */}
         </Routes>
     </Router>)

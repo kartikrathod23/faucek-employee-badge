@@ -5,46 +5,63 @@ import { saveAs } from "file-saver";
 import { FaLinkedin, FaInstagram, FaTwitter } from "react-icons/fa";
 import faucekLogo from "../assets/Faucek_Logo.png";
 import tiles from "../assets/tiles4.jpeg";
+import { useNavigate } from "react-router-dom";
 import { url } from "../server";
 
 const BadgeModal = ({ isOpen, onClose, userData }) => {
+
+    const navigate = useNavigate();
+
     const badgeRef = useRef();
+
+    const handleClose = () => {
+        onClose();
+        navigate("/thank-you", { state: { userData, badgeImageUrl: profileImgUrl } });
+    };
 
 
     const downloadBadge = async () => {
-        const badgeElement = badgeRef.current;
-        if (!badgeElement) return;
+    const badgeElement = badgeRef.current;
+    if (!badgeElement) return;
 
-        try {
-            const clone = badgeElement.cloneNode(true);
-            document.body.appendChild(clone);
-            clone.style.position = "absolute";
-            clone.style.top = "-1000000px";
+    try {
+        const clone = badgeElement.cloneNode(true);
+        document.body.appendChild(clone);
+        clone.style.position = "absolute";
+        clone.style.top = "-1000000px";
 
-            clone.style.backgroundColor = '#1a1a2e';
-            clone.style.backgroundImage = `linear-gradient(to top right, rgba(176, 108, 244, 0.5), rgba(176, 108, 244, 0.5), rgba(244, 72, 207, 0.5)), url(${tiles})`;
-            clone.style.backgroundRepeat = "no-repeat, repeat";
-            clone.style.backgroundSize = "cover, contain";
-            clone.style.backgroundBlendMode = '';
+        clone.style.backgroundColor = '#1a1a2e';
+        clone.style.backgroundImage = `linear-gradient(to top right, rgba(176, 108, 244, 0.5), rgba(176, 108, 244, 0.5), rgba(244, 72, 207, 0.5)), url(${tiles})`;
+        clone.style.backgroundRepeat = "no-repeat, repeat";
+        clone.style.backgroundSize = "cover, contain";
 
-            const canvas = await html2canvas(clone, {
-                useCORS: true,
-                allowTaint: true,
-                scale: 2,
-                backgroundColor: null,
-            });
+        const canvas = await html2canvas(clone, {
+            useCORS: true,
+            allowTaint: true,
+            scale: 2,
+            backgroundColor: null,
+        });
 
-            canvas.toBlob((blob) => {
-                if (blob) {
-                    saveAs(blob, `${userData.firstName}_${userData.lastName}_badge.png`);
-                }
-            });
+        document.body.removeChild(clone);
 
-            document.body.removeChild(clone);
-        } catch (error) {
-            console.error("Badge download failed:", error);
-        }
-    };
+        // Convert to blob for download and dataURL for preview
+        canvas.toBlob((blob) => {
+            if (blob) {
+                const badgeUrl = URL.createObjectURL(blob);
+                saveAs(blob, `${userData.firstName}_${userData.lastName}_badge.png`);
+                navigate("/thank-you", {
+                    state: {
+                        userData,
+                        badgeImageUrl: badgeUrl,
+                    },
+                });
+            }
+        });
+    } catch (error) {
+        console.error("Badge download failed:", error);
+    }
+};
+
 
     // useEffect(() => {
     //     const badge = badgeRef.current;
@@ -66,6 +83,7 @@ const BadgeModal = ({ isOpen, onClose, userData }) => {
     const [officialEmail, setOfficialEmail] = useState(userData.email || "");
     const [empID, setEmpID] = useState(userData.employeeId || "FAC-EMP-001");
     const designation = userData.selectedRole;
+    const phone = userData.phone;
 
     const profileImgUrl =
         typeof userData.profileImage === "string"
@@ -110,7 +128,7 @@ const BadgeModal = ({ isOpen, onClose, userData }) => {
         <div style={{ backgroundColor: "rgba(0, 0, 0, 0.8)" }} className="fixed inset-0 z-50 flex items-center justify-center px-4">
             <div className="relative max-w-[420px] animate-slideUp">
                 <button
-                    onClick={onClose}
+                    onClick={handleClose}
                     style={{ color: "#ffffff" }}
                     className="absolute top-0 z-10 right-2 text-3xl hover:scale-110 transition"
                 >
@@ -175,7 +193,7 @@ const BadgeModal = ({ isOpen, onClose, userData }) => {
                             <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Name</span><br /><span style={{ color: '#ddd' }}>{fullName}</span></div>
                             <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Designation</span><br /><span style={{ color: '#ddd' }}>{designation}</span></div>
                             <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Email</span><br /><span style={{ color: '#ddd' }}>{officialEmail}</span></div>
-                            <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Contact</span><br /><span style={{ color: '#ddd' }}>+91-9782040668</span></div>
+                            <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Contact</span><br /><span style={{ color: '#ddd' }}>{phone}</span></div>
                         </div>
                     </div>
 
