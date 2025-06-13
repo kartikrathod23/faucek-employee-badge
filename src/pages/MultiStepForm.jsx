@@ -274,8 +274,8 @@ const MultiStepForm = () => {
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1 pt-16 flex items-center justify-center px-6 overflow-hidden">
-                <div className="flex flex-col md:flex-row max-w-5xl w-full h-[60vh] rounded-xl overflow-hidden shadow-2xl backdrop-blur-md bg-gradient-to-br from-gray-800 via-gray-900 to-black animate__animated animate__fadeInUp">
+            <main className="flex-1 pt-20 flex items-center justify-center px-6 overflow-hidden">
+                <div className="flex flex-col md:flex-row max-w-5xl w-full h-[70vh] rounded-xl overflow-hidden shadow-2xl backdrop-blur-md bg-gradient-to-br from-gray-800 via-gray-900 to-black animate__animated animate__fadeInUp">
 
                     {/* Banner Section */}
                     <div className="relative w-full md:w-1/2 h-1/3 md:h-full">
