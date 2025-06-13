@@ -45,7 +45,7 @@ const MultiStepForm = () => {
 
     const nextStep = () => {
 
-        if(step==6){
+        if (step == 6) {
             e.preventDefault();
         }
 
@@ -265,48 +265,90 @@ const MultiStepForm = () => {
     };
 
     return (
-        <div className="min-h-screen px-6 py-4 flex items-center justify-center complex-background animate__animated animate__fadeIn">
+        <div className="h-screen flex flex-col complex-background">
+            {/* Navbar */}
             <nav className="w-full bg-white shadow-md backdrop-blur-sm fixed top-0 left-0 z-50 flex justify-center">
                 <div className="max-w-7xl mx-auto px-6 py-3 flex items-center">
                     <img src={logo} alt="Faucek Logo" className="h-12" />
                 </div>
             </nav>
-            <div className="flex flex-col mt-14 md:flex-row max-w-6xl w-full rounded-xl overflow-hidden shadow-2xl backdrop-blur-md bg-gradient-to-br from-gray-800 via-gray-900 to-black  animate__animated animate__fadeInUp">
-                <div className="relative w-full md:w-1/2 h-96 md:h-auto">
-                    <img src={banner} alt="Team" className="absolute inset-0 w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-6">
-                        <h2 className="text-4xl md:text-5xl font-extrbold text-white mb-2 animate__animated animate__zoomIn">
-                            We are <span className="faucek-gradient font-bold">FAUCEK</span>
-                        </h2>
-                        <p className="text-lg md:text-xl text-gray-200 animate__animated animate__fadeInUp">Empowering Innovation Together</p>
+
+            {/* Main Content */}
+            <main className="flex-1 pt-16 flex items-center justify-center px-6 overflow-hidden">
+                <div className="flex flex-col md:flex-row max-w-5xl w-full h-[60vh] rounded-xl overflow-hidden shadow-2xl backdrop-blur-md bg-gradient-to-br from-gray-800 via-gray-900 to-black animate__animated animate__fadeInUp">
+
+                    {/* Banner Section */}
+                    <div className="relative w-full md:w-1/2 h-1/3 md:h-full">
+                        <img src={banner} alt="Team" className="absolute inset-0 w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-6">
+                            <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-2 animate__animated animate__zoomIn">
+                                We are <span className="faucek-gradient font-bold">FAUCEK</span>
+                            </h2>
+                            <p className="text-lg md:text-xl text-gray-200 animate__animated animate__fadeInUp">
+                                Empowering Innovation Together
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Form Section */}
+                    <div className="w-full md:w-1/2 h-2/3 md:h-full bg-gray-900 bg-opacity-80 p-8 space-y-6 text-white animate__animated animate__fadeInUp overflow-y-auto">
+                        <p className="hidden md:block text-white text-5xl font-bold text-center">Welcome!</p>
+                        <p className="text-center text-gray-300 mb-16">
+                            Kindly fill in the complete details for generating your ID
+                        </p>
+                        <form
+                            onSubmit={handleSubmit}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    if (step < 6) {
+                                        nextStep();
+                                    } else {
+                                        handleSubmit(e);
+                                    }
+                                }
+                            }}
+                            className="space-y-4"
+                        >
+                            {renderStep()}
+                            <div className="flex justify-between pt-4">
+                                {step > 1 && !isLoading && (
+                                    <button
+                                        type="button"
+                                        onClick={prevStep}
+                                        className="px-6 py-3 text-white rounded-lg bg-gray-700 hover:bg-gray-600 transition"
+                                    >
+                                        Previous
+                                    </button>
+                                )}
+                                {step < 6 ? (
+                                    !isLoading && (
+                                        <button
+                                            type="button"
+                                            onClick={nextStep}
+                                            className="px-6 py-3 text-white rounded-lg bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 hover:opacity-90 transition"
+                                        >
+                                            Next
+                                        </button>
+                                    )
+                                ) : (
+                                    !isLoading && (
+                                        <button
+                                            type="submit"
+                                            className="px-6 py-3 text-white rounded-lg bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 hover:opacity-90 transition"
+                                        >
+                                            Generate Badge
+                                        </button>
+                                    )
+                                )}
+                                {isLoading && <p className="text-white">Generating Badge...</p>}
+                            </div>
+                        </form>
                     </div>
                 </div>
-                <div className="w-full md:w-1/2 bg-gray-900 bg-opacity-80 p-8 space-y-6 text-white animate__animated animate__fadeInUp">
-                    <p className='hidden md:block text-white text-5xl font-bold text-center'>Welcome!</p>
-                    <p className='text-center text-gray-300 mb-16'>Kindly fill in the complete details for generating your ID</p>
-                    <form
-                        onSubmit={handleSubmit}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                                e.preventDefault(); 
-                                if (step < 6) {
-                                    nextStep();
-                                } else {
-                                    handleSubmit(e); 
-                                }
-                            }
-                        }} className="space-y-4">
-                        {renderStep()}
-                        <div className="flex justify-between pt-4">
-                            {step > 1 && !isLoading && <button type="button" onClick={prevStep} className="px-6 py-3 text-white rounded-lg bg-gray-700 hover:bg-gray-600 transition">Previous</button>}
-                            {step < 6
-                                ? !isLoading && <button type="button" onClick={nextStep} className="px-6 py-3 text-white rounded-lg bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 hover:opacity-90 transition">Next</button>
-                                : !isLoading && <button type="submit" className="px-6 py-3 text-white rounded-lg bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500 hover:opacity-90 transition">Generate Badge</button>}
-                            {isLoading && <p className="text-white">Generating Badge...</p>}
-                        </div>
-                    </form>
-                </div>
-            </div>
+            </main>
+
+            {/* Badge Modal */}
             {isBadgeVisible && (
                 <BadgeModal
                     isOpen={isBadgeVisible}
@@ -314,7 +356,13 @@ const MultiStepForm = () => {
                     userData={formData}
                 />
             )}
+
+            {/* Footer */}
+            <footer className="w-full text-center py-4 text-gray-400 text-lg bg-black bg-opacity-70">
+                © {new Date().getFullYear()} <span className="font-semibold text-white">Faucek</span>. All rights reserved.
+            </footer>
         </div>
+
     );
 };
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import MultiStepForm from './pages/MultiStepForm'
-import ThankYouPage from './pages/ThankyouPage'
+import ThankYouPage from './pages/ThankYouPage'
 // import SubmissionsList from './pages/SubmissionsList';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 
