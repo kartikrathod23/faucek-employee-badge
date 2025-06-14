@@ -27,7 +27,7 @@ const MultiStepForm = () => {
     const [isBadgeVisible, setIsBadgeVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (e) => {
+    const handleChange = async (e) => {
         const { name, value, files, type } = e.target;
 
         if (type === 'file') {
@@ -40,11 +40,33 @@ const MultiStepForm = () => {
                 ...formData,
                 [name]: value ?? ''
             });
+
+            // Check for duplicate email when email field changes
+            if (name === 'email' && value) {
+                try {
+                    const response = await fetch(`${url}/api/check-email`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: value })
+                    });
+                    const data = await response.json();
+                    if (data.exists) {
+                        alert("This email is already registered. Please use a different email address.");
+                        setFormData(prev => ({
+                            ...prev,
+                            email: ''
+                        }));
+                    }
+                } catch (error) {
+                    console.error("Error checking email:", error);
+                }
+            }
         }
     };
 
-    const nextStep = () => {
-
+    const nextStep = async () => {
         if (step == 6) {
             e.preventDefault();
         }
@@ -74,13 +96,35 @@ const MultiStepForm = () => {
             return;
         }
 
-        const rawNumber = formData.phone.replace(/\D/g, ''); // Remove non-digits
-        if (rawNumber.length < 10) {
-            alert("Please enter a valid 10-digit phone number");
-            return;
+        // Phone number validation for India
+        if (step === 1) {
+            const rawNumber = formData.phone.replace(/\D/g, ''); // Remove non-digits
+            if (rawNumber.length < 10) {
+                alert("Please enter a valid 10-digit Indian phone number");
+                return;
+            }
         }
 
-
+        // Check for duplicate email in step 1
+        if (step === 1) {
+            try {
+                const response = await fetch(`${url}/api/check-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: formData.email })
+                });
+                const data = await response.json();
+                if (data.exists) {
+                    alert("This email is already registered. Please use a different email address.");
+                    return;
+                }
+            } catch (error) {
+                console.error("Error checking email:", error);
+                return;
+            }
+        }
 
         setStep((prev) => prev + 1);
     };
@@ -139,38 +183,88 @@ const MultiStepForm = () => {
             case 1:
                 return (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate__animated animate__fadeInUp">
-                        <input name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} className="p-3 rounded-md border-1 border-gray-400 bg-gray-800" required />
-                        <input name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} className="p-3 rounded-md border-1 border-gray-400 bg-gray-800" required />
-                        <input name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="p-3 rounded-md border-1 border-gray-400 bg-gray-800" required />
-                        <PhoneInput
-                            country={'in'}
-                            value={formData.phone}
-                            onChange={(phone) => setFormData({ ...formData, phone })}
-                            inputProps={{
-                                name: 'phone',
-                                required: true,
-                            }}
-                            inputClass="custom-phone-input"
-                            containerClass="w-full"
-                            buttonStyle={{
-                                borderTopLeftRadius: '8px',
-                                borderBottomLeftRadius: '8px',
-                                borderRight: '1px solid gray',
-                            }}
-                            inputStyle={{
-                                width: '100%',
-                                height: '100%',
-                                padding: '12px 12px 12px 58px', // extra left padding for country code
-                                borderRadius: '8px',
-                                border: '1px solid gray',
-                                backgroundColor: '#1f2937', // matches Tailwind's bg-gray-800
-                                color: 'white',
-                            }}
-                        />
+                        <div>
+                            <input
+                                name="firstName"
+                                placeholder="First Name"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                className="p-3 w-full rounded-md border border-gray-400 bg-gray-800 text-white"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <input
+                                name="lastName"
+                                placeholder="Last Name"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                className="p-3 w-full rounded-md border border-gray-400 bg-gray-800 text-white"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <input
+                                name="email"
+                                placeholder="Email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                className="p-3 w-full rounded-md border border-gray-400 bg-gray-800 text-white"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <PhoneInput
+                                country={'in'}
+                                value={formData.phone}
+                                onChange={(phone) => setFormData({ ...formData, phone })}
+                                inputProps={{
+                                    name: 'phone',
+                                    required: true,
+                                }}
+                                inputClass=""
+                                // containerClass="w-full"
+                                buttonStyle={{
+                                    borderTopLeftRadius: '8px',
+                                    borderBottomLeftRadius: '8px',
+                                    borderRight: '1px solid gray',
+                                    backgroundColor: '#1f2937',
+                                }}
+                                inputStyle={{
+                                    width: '100%',
+                                    height: '48px',
+                                    padding: '12px 12px 12px 58px',
+                                    borderRadius: '8px',
+                                    border: '1px solid gray',
+                                    backgroundColor: '#1f2937',
+                                    color: 'white',
+                                }}
+                                dropdownStyle={{
+                                    backgroundColor: '#fff',
+                                    color: 'black',
+                                    borderRadius: '8px',
+                                    maxHeight: '200px',
+                                    minWidth: '180px',
+                                    maxWidth: '100%',
+                                    width: 'auto',
+                                    overflowY: 'auto',
 
-
-                        <input name="city" placeholder="City" value={formData.city} onChange={handleChange} className="p-3 rounded-md border-1 border-gray-400 bg-gray-800" required />
+                                }}
+                                buttonClass="!bg-[#1f2937]"
+                            />
+                        </div>
+                        <div className="md:col-span-2">
+                            <input
+                                name="city"
+                                placeholder="City"
+                                value={formData.city}
+                                onChange={handleChange}
+                                className="p-3 w-full rounded-md border border-gray-400 bg-gray-800 text-white"
+                                required
+                            />
+                        </div>
                     </div>
+
                 );
             case 2:
                 return (
@@ -187,7 +281,17 @@ const MultiStepForm = () => {
                                     name="profileImage"
                                     type="file"
                                     accept="image/*"
-                                    onChange={handleChange}
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            if (file.size > 50 * 1024) {
+                                                alert("File size must be 50KB or less.");
+                                                e.target.value = ""; // Reset file input
+                                                return;
+                                            }
+                                            setFormData({ ...formData, profileImage: file });
+                                        }
+                                    }}
                                     className="hidden"
                                 />
                             </label>
@@ -197,6 +301,7 @@ const MultiStepForm = () => {
                         </div>
                     </div>
                 );
+
 
             case 3:
                 return (
@@ -265,20 +370,20 @@ const MultiStepForm = () => {
     };
 
     return (
-        <div className="h-screen flex flex-col complex-background">
+        <div className="min-h-screen flex flex-col complex-background">
             {/* Navbar */}
-            <nav className="w-full bg-white shadow-md backdrop-blur-sm fixed top-0 left-0 z-50 flex justify-center">
-                <div className="max-w-7xl mx-auto px-6 py-3 flex items-center">
+            <nav className="w-full bg-white shadow-md backdrop-blur-sm sticky top-0 z-50 flex justify-center">
+                <div className="max-w-7xl mx-auto px-6 py-1 flex items-center">
                     <img src={logo} alt="Faucek Logo" className="h-12" />
                 </div>
             </nav>
 
             {/* Main Content */}
-            <main className="flex-1 pt-20 flex items-center justify-center px-6 overflow-hidden">
-                <div className="flex flex-col md:flex-row max-w-5xl w-full h-[70vh] rounded-xl overflow-hidden shadow-2xl backdrop-blur-md bg-gradient-to-br from-gray-800 via-gray-900 to-black animate__animated animate__fadeInUp">
+            <div className="flex-grow flex items-center justify-center px-6 py-12 md:py-28 ">
+                <div className="flex flex-col md:flex-row max-w-5xl w-full rounded-xl shadow-2xl backdrop-blur-md bg-gradient-to-br from-gray-800 via-gray-900 to-black animate__animated animate__fadeInUp">
 
                     {/* Banner Section */}
-                    <div className="relative w-full md:w-1/2 h-1/3 md:h-full">
+                    <div className="relative w-full md:w-1/2 h-64 md:h-auto">
                         <img src={banner} alt="Team" className="absolute inset-0 w-full h-full object-cover" />
                         <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center text-center p-6">
                             <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-2 animate__animated animate__zoomIn">
@@ -291,7 +396,7 @@ const MultiStepForm = () => {
                     </div>
 
                     {/* Form Section */}
-                    <div className="w-full md:w-1/2 h-2/3 md:h-full bg-gray-900 bg-opacity-80 p-8 space-y-6 text-white animate__animated animate__fadeInUp overflow-y-auto">
+                    <div className="w-full md:w-1/2 bg-gray-900 bg-opacity-80 p-8 space-y-6 text-white animate__animated animate__fadeInUp">
                         <p className="hidden md:block text-white text-5xl font-bold text-center">Welcome!</p>
                         <p className="text-center text-gray-300 mb-16">
                             Kindly fill in the complete details for generating your ID
@@ -346,7 +451,7 @@ const MultiStepForm = () => {
                         </form>
                     </div>
                 </div>
-            </main>
+            </div>
 
             {/* Badge Modal */}
             {isBadgeVisible && (
@@ -358,12 +463,12 @@ const MultiStepForm = () => {
             )}
 
             {/* Footer */}
-            <footer className="w-full text-center py-4 text-gray-400 text-lg bg-black bg-opacity-70">
+            <footer className="w-full text-center py-2 text-gray-400 text-lg bg-black bg-opacity-70">
                 © {new Date().getFullYear()} <span className="font-semibold text-white">Faucek</span>. All rights reserved.
             </footer>
         </div>
-
     );
+
 };
 
 export default MultiStepForm;

@@ -193,7 +193,7 @@ const BadgeModal = ({ isOpen, onClose, userData }) => {
                             <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Name</span><br /><span style={{ color: '#ddd' }}>{fullName}</span></div>
                             <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Designation</span><br /><span style={{ color: '#ddd' }}>{designation}</span></div>
                             <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Email</span><br /><span style={{ color: '#ddd' }}>{officialEmail}</span></div>
-                            <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Contact</span><br /><span style={{ color: '#ddd' }}>{phone}</span></div>
+                            <div><span style={{ fontWeight: 'bold', color: '#fff' }}>Contact</span><br /><span style={{ color: '#ddd' }}>+{phone}</span></div>
                         </div>
                     </div>
 
