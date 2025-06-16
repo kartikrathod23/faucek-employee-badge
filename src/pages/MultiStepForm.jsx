@@ -25,32 +25,6 @@ const MultiStepForm = () => {
     });
     const [isBadgeVisible, setIsBadgeVisible] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [isCityValid, setIsCityValid] = useState(true);
-    const [isValidatingCity, setIsValidatingCity] = useState(false);
-
-    const validateCity = async (city) => {
-        if (!city.trim()) return false;
-        
-        setIsValidatingCity(true);
-        try {
-            const response = await fetch(`${url}/api/validate-city`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ city })
-            });
-            const data = await response.json();
-            setIsCityValid(data.isValid);
-            return data.isValid;
-        } catch (error) {
-            console.error('Error validating city:', error);
-            setIsCityValid(false);
-            return false;
-        } finally {
-            setIsValidatingCity(false);
-        }
-    };
 
     const handleChange = async (e) => {
         const { name, value, files, type } = e.target;
@@ -65,15 +39,6 @@ const MultiStepForm = () => {
                 ...formData,
                 [name]: value ?? ''
             });
-
-            // Validate city when city field changes
-            if (name === 'city') {
-                // Add a small delay to avoid too many API calls while typing
-                const timeoutId = setTimeout(async () => {
-                    await validateCity(value);
-                }, 500);
-                return () => clearTimeout(timeoutId);
-            }
 
             // Check for duplicate email when email field changes
             if (name === 'email' && value) {
@@ -128,15 +93,6 @@ const MultiStepForm = () => {
         if (!isStepValid) {
             alert('Please fill in all required fields.');
             return;
-        }
-
-        // Validate city before proceeding from step 1
-        if (step === 1) {
-            const isCityValid = await validateCity(formData.city);
-            if (!isCityValid) {
-                alert("Please enter a valid city name");
-                return;
-            }
         }
 
         // Phone number validation for India
@@ -194,12 +150,6 @@ const MultiStepForm = () => {
         }));
 
         data.append('profileImage', formData.profileImage);
-
-        // const rawNumber = formData.phone.replace(/\D/g, ''); // Remove non-digits
-        // if (rawNumber.length < 10) {
-        //     alert("Please enter a valid 10-digit phone number");
-        //     return;
-        // }
 
         try {
             const res = await fetch(`${url}/submit`, {
@@ -302,21 +252,9 @@ const MultiStepForm = () => {
                                 placeholder="City"
                                 value={formData.city}
                                 onChange={handleChange}
-                                className={`p-3 w-full rounded-md border ${
-                                    !isCityValid ? 'border-red-500' : 'border-gray-400'
-                                } bg-gray-800 text-white`}
+                                className="p-3 w-full rounded-md border border-gray-400 bg-gray-800 text-white"
                                 required
                             />
-                            {!isCityValid && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    Please enter a valid city name
-                                </p>
-                            )}
-                            {isValidatingCity && (
-                                <p className="text-gray-400 text-sm mt-1">
-                                    Validating city...
-                                </p>
-                            )}
                         </div>
                     </div>
 
