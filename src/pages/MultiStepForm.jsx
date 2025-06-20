@@ -6,7 +6,6 @@ import banner from '../assets/faucek_banner.jpg';
 import BadgeModal from './BadgeModal';
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css';
-// import tiles from '../assets/tiles.jpeg';
 import { url } from '../server';
 
 const MultiStepForm = () => {
